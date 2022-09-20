@@ -3,9 +3,9 @@
     public static class Program
     {
         //credentials (suppressed for privacy)
-        private const string LoginName = "<LOGIN_NAME>";
+        private const string LoginName = "chucklingAtomBot";
         private static readonly string Token = Environment.GetEnvironmentVariable("Token") ?? throw new InvalidOperationException();  //Token should be stored in a safe place
-        private static readonly List<string> ChannelsToJoin = new(new[] { "<CHANNEL_1>", "<CHANNEL_2>" });
+        private static readonly List<string> ChannelsToJoin = new(new[] { "thechucklingatom", "the_arcane_hipster" });
 
         //main function
         static void Main()
@@ -64,6 +64,8 @@
                             //Handling commands
                             if (msgTrimmed.Length >= 6 && msgTrimmed.Substring(0, 6) == "!8ball")
                                 toRespond = chatBot.Command_MagicEightBall();
+                            else if (msgTrimmed.Length >= 6 && msgTrimmed.Substring(0, 6) == "!berry")
+                                toRespond = chatBot.Command_Berry(msgTrimmed.Substring(6).Trim().ToLower());
                             else if (msgTrimmed == "!age")
                                 toRespond = chatBot.Command_Age();
                             else if (msgTrimmed == "!discord")

@@ -146,6 +146,18 @@ namespace AtomBot
 
             return s;
         }
+
+        public string Command_Berry(string berryName)
+        {
+            string berryInfo = "No info for this berry";
+
+            if (Constants.BerryLookup.ContainsKey(berryName))
+            {
+                berryInfo = Constants.BerryLookup[berryName];
+            }
+            
+            return berryInfo;
+        }
         #endregion
     }
 }
