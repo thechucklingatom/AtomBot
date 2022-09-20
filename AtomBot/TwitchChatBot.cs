@@ -1,27 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Net.Sockets;
-using System.IO;
+﻿using System.Net.Sockets;
 
-namespace ChatBot_Demo
+namespace AtomBot
 {
     public class TwitchChatBot
     {
         //Props
-        public TcpClient Client;
-        public StreamReader Reader;
-        public StreamWriter Writer;
-        private string Login_Name { get; set; }
+        public TcpClient? Client;
+        public StreamReader? Reader;
+        public StreamWriter? Writer;
+        private string LoginName { get; set; }
         private string Token { get; set; }
-        private string Channel_To_Join { get; set; }
+        private string ChannelToJoin { get; set; }
 
         //constructor
         public TwitchChatBot(string l, string t, string c)
         {
-            this.Login_Name = l;
-            this.Token = t;
-            this.Channel_To_Join = c;
+            LoginName = l;
+            Token = t;
+            ChannelToJoin = c;
         }
 
         #region IRC
@@ -36,9 +32,9 @@ namespace ChatBot_Demo
             Writer = new StreamWriter(Client.GetStream());
 
             Writer.WriteLine("PASS " + Token);
-            Writer.WriteLine("NICK " + Login_Name);
-            Writer.WriteLine("USER " + Login_Name + " 8 * :" + Login_Name);
-            Writer.WriteLine("JOIN #" + Channel_To_Join);
+            Writer.WriteLine("NICK " + LoginName);
+            Writer.WriteLine("USER " + LoginName + " 8 * :" + LoginName);
+            Writer.WriteLine("JOIN #" + ChannelToJoin);
             Writer.Flush();
         }
 
@@ -46,10 +42,10 @@ namespace ChatBot_Demo
         /// Reads a message from the chat of the channel you're joined to
         /// </summary>
         /// <returns>string</returns>
-        public string ReadMessage()
+        public string? ReadMessage()
         {
-            string chat_message = Reader.ReadLine();
-            return chat_message;
+            string? chatMessage = Reader?.ReadLine();
+            return chatMessage;
         }
 
         /// <summary>
@@ -59,10 +55,10 @@ namespace ChatBot_Demo
         /// <returns>void</returns>
         public void SendMessage(string message)
         {
-            string toSend = (":" + Login_Name + "!" + Login_Name + "@" + Login_Name +
-            ".tmi.twitch.tv PRIVMSG #" + Channel_To_Join + " :" + message);
-            Writer.WriteLine(toSend);
-            Writer.Flush();
+            string toSend = (":" + LoginName + "!" + LoginName + "@" + LoginName +
+            ".tmi.twitch.tv PRIVMSG #" + ChannelToJoin + " :" + message);
+            Writer?.WriteLine(toSend);
+            Writer?.Flush();
         }
 
         /// <summary>
@@ -72,8 +68,8 @@ namespace ChatBot_Demo
         public void SendPing()
         {
             Console.WriteLine("Sending PING....");
-            Writer.WriteLine("PING :irc.twitch.tv");
-            Writer.Flush();
+            Writer?.WriteLine("PING :irc.twitch.tv");
+            Writer?.Flush();
         }
 
         /// <summary>
@@ -83,8 +79,8 @@ namespace ChatBot_Demo
         public void SendPong()
         {
             Console.WriteLine("Sending PONG....");
-            Writer.WriteLine("PONG :irc.twitch.tv");
-            Writer.Flush();
+            Writer?.WriteLine("PONG :irc.twitch.tv");
+            Writer?.Flush();
         }
 
         #endregion

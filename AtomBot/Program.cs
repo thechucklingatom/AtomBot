@@ -1,38 +1,25 @@
-﻿using System;
-using System.Net.Sockets;
-using System.IO;
-using System.Collections.Generic;
-
-namespace ChatBot_Demo
+﻿namespace AtomBot
 {
-    class Program
+    public static class Program
     {
         //credentials (suppressed for privacy)
-        private static string login_name = "<LOGIN_NAME>";
-        private static string token = Environment.GetEnvironmentVariable("Token");  //Token should be stored in a safe place
-        private static List<string> channels_to_join = new List<string>(new string[] { "<CHANNEL_1>", "<CHANNEL_2>" });
+        private const string LoginName = "<LOGIN_NAME>";
+        private static readonly string Token = Environment.GetEnvironmentVariable("Token") ?? throw new InvalidOperationException();  //Token should be stored in a safe place
+        private static readonly List<string> ChannelsToJoin = new(new[] { "<CHANNEL_1>", "<CHANNEL_2>" });
 
         //main function
-        static void Main(string[] args)
+        static void Main()
         {
             //Testing writing to line
             Console.WriteLine("Hello World!");
 
             //New up a List of TwitchChatBot objects
-            List<TwitchChatBot> chatBots = new List<TwitchChatBot>();
-
             //add each channel to the list
-            for (int i = 0; i < channels_to_join.Count; i++)
-            {
-                chatBots.Add(new TwitchChatBot(login_name, token, channels_to_join[i]));
-            }
+            List<TwitchChatBot> chatBots = ChannelsToJoin.Select(t => new TwitchChatBot(LoginName, Token, t)).ToList();
 
             //for each chatBot...
-            for (int i = 0; i < chatBots.Count; i++)
+            foreach (var chatBot in chatBots)
             {
-                //this chatBot
-                TwitchChatBot chatBot = chatBots[i];
-
                 //Connect to Twitch IRC
                 chatBot.Connect();
 
@@ -45,13 +32,10 @@ namespace ChatBot_Demo
             while (true)
             {
                 //for each chatBot...
-                for (int i = 0; i < chatBots.Count; i++)
+                foreach (var chatBot in chatBots)
                 {
-                    //this chatbot
-                    TwitchChatBot chatBot = chatBots[i];
-
                     //if we get disconnected, reconnect
-                    if (!chatBot.Client.Connected)
+                    if (chatBot.Client is { Connected: false })
                     {
                         chatBot.Connect();
                     }
@@ -59,10 +43,10 @@ namespace ChatBot_Demo
                     else
                     {
                         //get the message that just came through
-                        string msg = chatBot.ReadMessage();
+                        string? msg = chatBot.ReadMessage();
 
                         //did we receive a message?
-                        if (msg != "" && msg != null)
+                        if (!string.IsNullOrEmpty(msg))
                         {
                             //write the raw message to the console
                             Console.WriteLine(msg);
@@ -75,7 +59,7 @@ namespace ChatBot_Demo
                                 chatBot.SendPong();
 
                             //Trim the message to just the chat message piece
-                            string msgTrimmed = trimMessage(msg);
+                            string msgTrimmed = TrimMessage(msg);
 
                             //Handling commands
                             if (msgTrimmed.Length >= 6 && msgTrimmed.Substring(0, 6) == "!8ball")
@@ -94,9 +78,9 @@ namespace ChatBot_Demo
 
                     }
                 }
-
             }
 
+            // ReSharper disable once FunctionNeverReturns
         }
 
         #region Helper methods
@@ -105,21 +89,21 @@ namespace ChatBot_Demo
         /// </summary>
         /// <param name="message"></param>
         /// <returns>string</returns>
-        public static string trimMessage(string message)
+        private static string TrimMessage(string message)
         {
-            int indexOfSecondColon = getNthIndex(message, ':', 2);
+            int indexOfSecondColon = GetNthIndex(message, ':', 2);
             var result = message.Substring(indexOfSecondColon + 1);
             return result;
         }
 
         /// <summary>
-        /// Gets the second colon, which is the seperator before the chat message
+        /// Gets the second colon, which is the separator before the chat message
         /// </summary>
         /// <param name="s"></param>
         /// <param name="t"></param>
         /// <param name="n"></param>
         /// <returns>string</returns>
-        public static int getNthIndex(string s, char t, int n)
+        private static int GetNthIndex(string s, char t, int n)
         {
             int count = 0;
             for (int i = 0; i < s.Length; i++)
