@@ -2,15 +2,16 @@ namespace AtomBot;
 
 public class Constants
 {
-    private static readonly string ConfuseHealthRestore = "Restores 12.5% of its HP when its HP drops to one half or below.";
+    private static readonly string ConfuseHealthRestore = 
+        "Restores 12.5% of its HP when its HP drops to one half or below. It confuses Pokémon that have ";
     private static readonly string NoEffect = "No effect";
     public static readonly Dictionary<string, string> BerryLookup = new()
     {
-        {"aguav", ConfuseHealthRestore + " It confuses Pokémon that have -spd natures; Naughty, Rash, Naive, or Lax"},
-        {"figy", ConfuseHealthRestore + " It confuses Pokémon that have -att natures; Modest, Timid, Calm, or Bold"},
-        {"iapapa", ConfuseHealthRestore + " It confuses Pokémon that have -def natures; Lonely, Mild, Gentle, or Hasty"},
-        {"mago", ConfuseHealthRestore + " It confuses Pokémon that have -speed natures; Brave, Quiet, Sassy, or Relaxed"},
-        {"wiki", ConfuseHealthRestore + " It confuses Pokémon that have -spa natures; Adamant, Jolly, Careful, or Impish"},
+        {"aguav", ConfuseHealthRestore + "-spd natures; Naughty, Rash, Naive, or Lax"},
+        {"figy", ConfuseHealthRestore + "-att natures; Modest, Timid, Calm, or Bold"},
+        {"iapapa", ConfuseHealthRestore + "-def natures; Lonely, Mild, Gentle, or Hasty"},
+        {"mago", ConfuseHealthRestore + " -speed natures; Brave, Quiet, Sassy, or Relaxed"},
+        {"wiki", ConfuseHealthRestore + "-spa natures; Adamant, Jolly, Careful, or Impish"},
         {"cheri", "Cures paralysis."},
         {"chesto", "Cures sleep."},
         {"pecha", "Cures poison."},
