@@ -74,7 +74,7 @@ public class Constants
         {"roseli", "Halves damage taken from a super effective Fairy-type move."},
         {"kee", "Raises Defense when hit with a physical move."},
         {"maranga", "Raises Special Defense when hit with a special move."},
-        {"hopo", "Restores PP. If used on a wild Pokemon, the wild Pokemon's reactions are dulled."},
+        {"hopo", "Restores PP. If used on a wild Pokémon, the wild Pokémon's reactions are dulled."},
         {"egg", "Is it easter?"},
     };
 }
