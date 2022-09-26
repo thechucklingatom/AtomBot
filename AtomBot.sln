@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AtomBot", "AtomBot\AtomBot.csproj", "{51346F22-F69E-4C71-884A-305EDE82B6AA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AtomBotTests", "AtomBotTests\AtomBotTests.csproj", "{B7631B73-AC5E-4AAE-996E-99AB2383C73B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{51346F22-F69E-4C71-884A-305EDE82B6AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{51346F22-F69E-4C71-884A-305EDE82B6AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{51346F22-F69E-4C71-884A-305EDE82B6AA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B7631B73-AC5E-4AAE-996E-99AB2383C73B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B7631B73-AC5E-4AAE-996E-99AB2383C73B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B7631B73-AC5E-4AAE-996E-99AB2383C73B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B7631B73-AC5E-4AAE-996E-99AB2383C73B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

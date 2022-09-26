@@ -5,7 +5,7 @@
         //credentials (suppressed for privacy)
         private const string LoginName = "chucklingAtomBot";
         private static readonly string Token = Environment.GetEnvironmentVariable("Token") ?? throw new InvalidOperationException();  //Token should be stored in a safe place
-        private static readonly List<string> ChannelsToJoin = new(new[] { "thechucklingatom", "the_arcane_hipster" });
+        private static readonly List<string> ChannelsToJoin = new(new[] { "the_arcane_hipster" });
 
         //main function
         static void Main()

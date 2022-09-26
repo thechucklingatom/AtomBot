@@ -146,7 +146,12 @@ namespace AtomBot
 
             return s;
         }
-
+        
+        /// <summary>
+        /// Handles the !berry berryName command. Returns what the berry does if it is a known berry.
+        /// </summary>
+        /// <param name="berryName">The berry name to look up.</param>
+        /// <returns>A string explaining the berry if found, or no info if unknown berry.</returns>
         public string Command_Berry(string berryName)
         {
             string berryInfo = "No info for this berry";
