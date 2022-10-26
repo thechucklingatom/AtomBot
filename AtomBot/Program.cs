@@ -42,7 +42,11 @@
                     //else we're connected
                     else
                     {
-                        //get the message that just came through
+                        if (chatBot.HasAvailableQueuedMessage())
+                        {
+                            chatBot.SendMessage(chatBot.GetAvailableQueuedMessage());
+                        }
+                        //get the message that just came through blocking call, can cause issues with delaying queued message.
                         string? msg = chatBot.ReadMessage();
 
                         //did we receive a message?
@@ -70,6 +74,10 @@
                                 toRespond = chatBot.Command_Age();
                             else if (msgTrimmed == "!discord")
                                 toRespond = chatBot.Command_Discord();
+                            else if (msgTrimmed == "!spellbook" && !chatBot.spellbookIsRecharging)
+                                toRespond = chatBot.Command_SpellBook();
+                            else if (msgTrimmed.ToLower() == "!f" || msgTrimmed.ToLower() == "!rip")
+                                toRespond = "RIP in pepperonis BibleThump";
 
                             //Write response to console and send message to chat
                             Console.WriteLine(toRespond);

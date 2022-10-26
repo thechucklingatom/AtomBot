@@ -8,6 +8,8 @@ namespace AtomBot
         public TcpClient? Client;
         public StreamReader? Reader;
         public StreamWriter? Writer;
+        private PriorityQueue<string, DateTime> messageTimerQueue;
+        public bool spellbookIsRecharging = false;
         private string LoginName { get; set; }
         private string Token { get; set; }
         private string ChannelToJoin { get; set; }
@@ -18,6 +20,7 @@ namespace AtomBot
             LoginName = l;
             Token = t;
             ChannelToJoin = c;
+            messageTimerQueue = new PriorityQueue<string, DateTime>();
         }
 
         #region IRC
@@ -162,6 +165,42 @@ namespace AtomBot
             }
             
             return berryInfo;
+        }
+        
+        /// <summary>
+        /// Handles the !spellbook recharge. Lets people know when the spellbook will be ready again.
+        /// </summary>
+        /// <returns>The time when the spellbook will be available again.</returns>
+        public string Command_SpellBook()
+        {
+            DateTime spellbookRechargedTime = DateTime.Now.AddMinutes(4);
+            messageTimerQueue.Enqueue("The spellbook has recharged! Use command !spellbook to cast a spell!", spellbookRechargedTime);
+            spellbookIsRecharging = true;
+            return "The spellbooks magic is about to be used up. The recharge bar says 4 minutes.";
+        }
+
+        /// <summary>
+        /// Check if there is a message that has been added to the queue that is ready to send.
+        /// </summary>
+        /// <returns>true if there is a message ready for dequeue.</returns>
+        public bool HasAvailableQueuedMessage()
+        {
+            if (messageTimerQueue.TryPeek(out _, out DateTime element))
+            {
+                return DateTime.Now > element;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Returns a message to send to twitch after its time in the queue is up.
+        /// </summary>
+        /// <returns></returns>
+        public string GetAvailableQueuedMessage()
+        {
+            messageTimerQueue.TryDequeue(out string? element, out _);
+            spellbookIsRecharging = false;
+            return element ?? string.Empty;
         }
         #endregion
     }
