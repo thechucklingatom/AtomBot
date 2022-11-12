@@ -1,4 +1,6 @@
-﻿namespace AtomBot
+﻿using AtomBot.DelayedCommands;
+
+namespace AtomBot
 {
     public static class Program
     {
@@ -6,6 +8,7 @@
         private const string LoginName = "chucklingAtomBot";
         private static readonly string Token = Environment.GetEnvironmentVariable("Token") ?? throw new InvalidOperationException();  //Token should be stored in a safe place
         private static readonly List<string> ChannelsToJoin = new(new[] { "the_arcane_hipster" });
+        private static readonly PriorityQueue<IDelayedCommand?, DateTime> MessageTimerQueue = new();
 
         //main function
         static void Main()
@@ -16,6 +19,11 @@
             //New up a List of TwitchChatBot objects
             //add each channel to the list
             List<TwitchChatBot> chatBots = ChannelsToJoin.Select(t => new TwitchChatBot(LoginName, Token, t)).ToList();
+
+            List<IDelayedCommand> delayedCommands = new List<IDelayedCommand>()
+            {
+                new Spellbook(),
+            };
 
             //for each chatBot...
             foreach (var chatBot in chatBots)
@@ -42,9 +50,9 @@
                     //else we're connected
                     else
                     {
-                        if (chatBot.HasAvailableQueuedMessage())
+                        if (HasAvailableQueuedMessage())
                         {
-                            chatBot.SendMessage(chatBot.GetAvailableQueuedMessage());
+                            chatBot.SendMessage(GetAvailableQueuedMessage());
                         }
                         //get the message that just came through blocking call, can cause issues with delaying queued message.
                         string? msg = chatBot.ReadMessage();
@@ -74,10 +82,16 @@
                                 toRespond = chatBot.Command_Age();
                             else if (msgTrimmed == "!discord")
                                 toRespond = chatBot.Command_Discord();
-                            else if (msgTrimmed == "!spellbook" && !chatBot.spellbookIsRecharging)
-                                toRespond = chatBot.Command_SpellBook();
                             else if (msgTrimmed.ToLower() == "!f" || msgTrimmed.ToLower() == "!rip")
                                 toRespond = "RIP in pepperonis BibleThump";
+
+                            IDelayedCommand? delayedCommand = delayedCommands.Find(command =>
+                                command.MatchesActivationCommand(msgTrimmed) && command.CanQueue());
+                            if (delayedCommand != null)
+                            {
+                                toRespond = delayedCommand.CommandResponse();
+                                MessageTimerQueue.Enqueue(delayedCommand, delayedCommand.CommandResponsePostTime());
+                            }
 
                             //Write response to console and send message to chat
                             Console.WriteLine(toRespond);
@@ -128,6 +142,29 @@
                 }
             }
             return -1;
+        }
+
+        /// <summary>
+        /// Check if there is a message that has been added to the queue that is ready to send.
+        /// </summary>
+        /// <returns>true if there is a message ready for dequeue.</returns>
+        public static bool HasAvailableQueuedMessage()
+        {
+            if (MessageTimerQueue.TryPeek(out _, out DateTime element))
+            {
+                return DateTime.Now > element;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Returns a message to send to twitch after its time in the queue is up.
+        /// </summary>
+        /// <returns></returns>
+        public static string GetAvailableQueuedMessage()
+        {
+            MessageTimerQueue.TryDequeue(out IDelayedCommand? element, out _);
+            return element?.DelayedMessage() ?? string.Empty;
         }
         #endregion
 

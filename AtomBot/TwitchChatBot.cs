@@ -1,4 +1,5 @@
 ﻿using System.Net.Sockets;
+using AtomBot.DelayedCommands;
 
 namespace AtomBot
 {
@@ -6,10 +7,8 @@ namespace AtomBot
     {
         //Props
         public TcpClient? Client;
-        public StreamReader? Reader;
-        public StreamWriter? Writer;
-        private PriorityQueue<string, DateTime> messageTimerQueue;
-        public bool spellbookIsRecharging = false;
+        private StreamReader? _reader;
+        private StreamWriter? _writer;
         private string LoginName { get; set; }
         private string Token { get; set; }
         private string ChannelToJoin { get; set; }
@@ -20,7 +19,6 @@ namespace AtomBot
             LoginName = l;
             Token = t;
             ChannelToJoin = c;
-            messageTimerQueue = new PriorityQueue<string, DateTime>();
         }
 
         #region IRC
@@ -31,14 +29,14 @@ namespace AtomBot
         public void Connect()
         {
             Client = new TcpClient("irc.twitch.tv", 6667);
-            Reader = new StreamReader(Client.GetStream());
-            Writer = new StreamWriter(Client.GetStream());
+            _reader = new StreamReader(Client.GetStream());
+            _writer = new StreamWriter(Client.GetStream());
 
-            Writer.WriteLine("PASS " + Token);
-            Writer.WriteLine("NICK " + LoginName);
-            Writer.WriteLine("USER " + LoginName + " 8 * :" + LoginName);
-            Writer.WriteLine("JOIN #" + ChannelToJoin);
-            Writer.Flush();
+            _writer.WriteLine("PASS " + Token);
+            _writer.WriteLine("NICK " + LoginName);
+            _writer.WriteLine("USER " + LoginName + " 8 * :" + LoginName);
+            _writer.WriteLine("JOIN #" + ChannelToJoin);
+            _writer.Flush();
         }
 
         /// <summary>
@@ -47,7 +45,7 @@ namespace AtomBot
         /// <returns>string</returns>
         public string? ReadMessage()
         {
-            string? chatMessage = Reader?.ReadLine();
+            string? chatMessage = _reader?.ReadLine();
             return chatMessage;
         }
 
@@ -60,8 +58,8 @@ namespace AtomBot
         {
             string toSend = (":" + LoginName + "!" + LoginName + "@" + LoginName +
             ".tmi.twitch.tv PRIVMSG #" + ChannelToJoin + " :" + message);
-            Writer?.WriteLine(toSend);
-            Writer?.Flush();
+            _writer?.WriteLine(toSend);
+            _writer?.Flush();
         }
 
         /// <summary>
@@ -71,8 +69,8 @@ namespace AtomBot
         public void SendPing()
         {
             Console.WriteLine("Sending PING....");
-            Writer?.WriteLine("PING :irc.twitch.tv");
-            Writer?.Flush();
+            _writer?.WriteLine("PING :irc.twitch.tv");
+            _writer?.Flush();
         }
 
         /// <summary>
@@ -82,8 +80,8 @@ namespace AtomBot
         public void SendPong()
         {
             Console.WriteLine("Sending PONG....");
-            Writer?.WriteLine("PONG :irc.twitch.tv");
-            Writer?.Flush();
+            _writer?.WriteLine("PONG :irc.twitch.tv");
+            _writer?.Flush();
         }
 
         #endregion
@@ -165,42 +163,6 @@ namespace AtomBot
             }
             
             return berryInfo;
-        }
-        
-        /// <summary>
-        /// Handles the !spellbook recharge. Lets people know when the spellbook will be ready again.
-        /// </summary>
-        /// <returns>The time when the spellbook will be available again.</returns>
-        public string Command_SpellBook()
-        {
-            DateTime spellbookRechargedTime = DateTime.Now.AddMinutes(4);
-            messageTimerQueue.Enqueue("The spellbook has recharged! Use command !spellbook to cast a spell!", spellbookRechargedTime);
-            spellbookIsRecharging = true;
-            return "The spellbooks magic is about to be used up. The recharge bar says 4 minutes.";
-        }
-
-        /// <summary>
-        /// Check if there is a message that has been added to the queue that is ready to send.
-        /// </summary>
-        /// <returns>true if there is a message ready for dequeue.</returns>
-        public bool HasAvailableQueuedMessage()
-        {
-            if (messageTimerQueue.TryPeek(out _, out DateTime element))
-            {
-                return DateTime.Now > element;
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// Returns a message to send to twitch after its time in the queue is up.
-        /// </summary>
-        /// <returns></returns>
-        public string GetAvailableQueuedMessage()
-        {
-            messageTimerQueue.TryDequeue(out string? element, out _);
-            spellbookIsRecharging = false;
-            return element ?? string.Empty;
         }
         #endregion
     }
